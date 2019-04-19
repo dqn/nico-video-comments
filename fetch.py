@@ -55,10 +55,10 @@ def execute(mail, password, video_id, count):
         'version': VERSION,
         'scores': SCORES,
         'thread': flv.get('thread_id'),
-        'res_from': -1 * int(count)
+        'res_from': -1 * int(count) if count else 1000
     }
 
-    if flv['needs_key'] == '1':
+    if flv.get('needs_key') == '1':
         # needs_key が 1 の場合、追加でパラメータが必要。
         soup = text_to_soup(get_threadkey(session, flv.get('thread_id')).text)
         threadkey = qs_to_dict(soup.html.body.p.text)
@@ -73,22 +73,23 @@ def execute(mail, password, video_id, count):
     return [xmltodict.parse(str(chat)).get('chat') for chat in soup.select('chat')]
 
 def usage():
-    print('Usage: python fetch.py [mail] [password] [video id] [count]')
+    print('Usage: python fetch.py <mail> <password> <video_id> [count]')
 
 def main():
-    if len(sys.argv) != 5:
+    arglen = len(sys.argv)
+    if arglen != 4 and arglen != 5:
         return usage()
 
     comment_list = execute(
         sys.argv[1],
         sys.argv[2],
         sys.argv[3],
-        sys.argv[4]
+        sys.argv[4] if arglen == 5 else None
     )
 
     with open(OUTPUT_FILE, mode='w') as f:
         f.write(json.dumps(comment_list, indent=2))
-    print(OUTPUT_FILE)
+    print('Complete fetch comments({})'.format(OUTPUT_FILE))
 
 if __name__ == '__main__':
     main()

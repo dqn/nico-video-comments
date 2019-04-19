@@ -3,6 +3,5 @@
 
 ## Usage
 ```sh
-$ python fetch.py [mail] [password] [video id] [count]
-# -> ./comments.json
+$ python fetch.py <mail> <password> <video_id> [count]
 ```
